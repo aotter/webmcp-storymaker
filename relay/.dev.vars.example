@@ -1,0 +1,7 @@
+# Copy this file to .dev.vars (git-ignored) for local `wrangler dev` -- it overrides
+# wrangler.jsonc's production placeholder for ALLOWED_ORIGIN back to the local web app dev
+# server's URL. No need to override any *_TTL_MS -- the production 5/10/60 minute values are fine
+# for local development.
+#
+#   cp .dev.vars.example .dev.vars
+ALLOWED_ORIGIN=http://localhost:5173

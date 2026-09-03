@@ -1,0 +1,49 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "webmcp-storymaker-preview-relay",
+  "main": "src/index.ts",
+  // See the docs' date policy: a new project is pinned to today's date. This relay doesn't rely on
+  // any behavior tied to a compatibility flag, so there's no need to bump this later just to chase
+  // new features -- but whenever this code is actually touched again, take the chance to check
+  // whether Cloudflare's current compatibility-date convention has changed.
+  "compatibility_date": "2026-09-03",
+
+  // A personal Cloudflare account -- setting this alone doesn't mean it's deployed. An actual
+  // deploy (wrangler deploy) is a separate, explicit action the supervisor confirms and runs, see
+  // the "Deploy" section of README.md.
+  "account_id": "d334aa2daf52e9f84a3a461854eb1882",
+
+  "durable_objects": {
+    "bindings": [{ "name": "SESSION", "class_name": "SessionDO" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionDO"] }],
+
+  // ALLOWED_ORIGIN: the only frontend Origin allowed to connect to /session. What's filled in here
+  // is a **placeholder value** for the production frontend URL (the URL webmcp-storymaker, this web
+  // app, gets once deployed to Cloudflare Pages) -- local development never uses this value:
+  // relay/.dev.vars (git-ignored, see relay/.dev.vars.example) overrides it to the local
+  // http://localhost:5173, which `wrangler dev` applies automatically. When deploying to
+  // production, if the frontend's final URL differs from this placeholder, whoever deploys it needs
+  // to remember to update this too (or override it with
+  // `wrangler deploy --var ALLOWED_ORIGIN:<actual URL>`) before redeploying -- see the "Deploy"
+  // section of README.md.
+  //
+  // The four *_TTL_MS entries are overridable versions of the matching constants in
+  // relay/src/protocol-limits.ts (as strings, since wrangler vars are always strings) -- if the code
+  // can't read one or reads an invalid value, it falls back to that constant (see readTtlMs() in
+  // relay/src/session-do.ts). What's filled in here are the real production values; normal deploys
+  // don't need to touch them. relay/vitest.config.ts overrides a few of them with extremely short
+  // values for tests, to verify that TTL/pre-auth timeouts actually end the connection, without
+  // having to wait several real minutes.
+  "vars": {
+    "ALLOWED_ORIGIN": "https://webmcp-storymaker.pages.dev",
+    "PAIRING_TTL_MS": "300000",
+    "IDLE_TTL_MS": "600000",
+    "ABSOLUTE_TTL_MS": "3600000",
+    "PRE_AUTH_TIMEOUT_MS": "10000"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

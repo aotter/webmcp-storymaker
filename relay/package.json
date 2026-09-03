@@ -1,0 +1,27 @@
+{
+  "name": "webmcp-storymaker-preview-relay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The relay for the phone QR-code preview: a Cloudflare Worker + Durable Object that only forwards WebSocket messages, with zero storage. Deployed independently, with its own lifecycle, and no dependency on the web app's build output.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "types": "wrangler types",
+    "typecheck": "pnpm types && tsc --noEmit -p tsconfig.json",
+    "check:no-storage": "node scripts/check-no-storage.mjs",
+    "test": "pnpm types && pnpm check:no-storage && vitest run",
+    "check": "pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.1.3",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.128.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "workerd"]
+  }
+}

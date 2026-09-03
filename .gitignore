@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+.wrangler/
+dist/
+
+
+# Local Claude Code tooling (launch config, agent worktrees)
+.claude/
+# local-only word list (never commit)
+.scrub-words

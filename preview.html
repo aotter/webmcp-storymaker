@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StoryMaker Preview</title>
+    <!-- This page is the one place where PreviewReader (src/preview/reader.ts, .pv-root) is
+         actually mounted as a "full page" - the height chain (html/body/#app all need
+         height:100% for .pv-root's height:100% to reach the viewport) and the body margin
+         reset therefore live here, not in the shared reader.css (that file deliberately
+         stays "mount-agnostic" - see the note on its .pv-root rule). -->
+    <style>
+      html,
+      body,
+      #app {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/preview/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,357 @@
+/* Styles dedicated to PreviewReader - independent
+ * of ../ui/style.css, standing on its own with no dependency on any ui/** file (the preview.html
+ * entry point's boundary rule: "preview.html must not import src/ui/**"; CSS has no JS boundary
+ * problem, but keeping it a separate file is still a deliberate decision, so the preview module
+ * stays truly self-contained and creates no hidden coupling elsewhere).
+ *
+ * The color tokens are the reader's own wide-screen/phone design, defined independently under a
+ * --pv-* prefix - this is not a new color scheme, it is an independent copy of the same design
+ * decision.
+ *
+ * Responsive layout: >480px shows the illustration on the left and the text
+ * on the right; <=480px stacks the illustration above the text in a single column, with a
+ * 56px minimum height for nav buttons. */
+
+[hidden] {
+  display: none !important;
+}
+
+/* As of Chrome 140, the "two-finger swipe triggers browser
+ * back/forward" gesture only honors overscroll-behavior-x on the html root element (setting
+ * it on body does nothing) - this CSS file is mounted in two places: the creator's "preview
+ * reading" tab (imported by ../ui/dom.ts) and preview.html (imported by ../preview/main.ts),
+ * and both sides' html root elements need this rule. Putting it in the shared file covers
+ * both in one place instead of each mount point declaring it separately
+ * (mirrors the sibling rule in ../ui/style.css). */
+html {
+  overscroll-behavior-x: none;
+}
+
+:root {
+  color-scheme: light;
+  --pv-bg: #fbf6ee;
+  --pv-surface: #ffffff;
+  --pv-border: #e7dac0;
+  --pv-ink: #2b2419;
+  --pv-ink-muted: #7c6f5b;
+  --pv-ink-faint: #a99a80;
+  --pv-accent: #c1552f;
+  --pv-accent-dark: #9e4324;
+  --pv-accent-soft: #f5dfcb;
+  --pv-accent-ink: #ffffff;
+  --pv-error: #b5502f;
+  --pv-error-bg: #fbe9e2;
+  --pv-radius-md: 14px;
+  --pv-radius-lg: 22px;
+  --pv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.pv-root {
+  display: flex;
+  flex-direction: column;
+  /* `height: 100%`, not `min-height` - this component has two mount scenarios, so the
+   * authority for the height chain is deliberately not kept here; each mount point is
+   * responsible for wiring its own height chain (preview.html's own <style>;
+   * ../ui/dom.ts drops it inside `.ll-main-wide`). */
+  height: 100%;
+  background: var(--pv-surface);
+  color: var(--pv-ink);
+  font-family: var(--pv-font);
+  line-height: 1.55;
+}
+
+.pv-topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  background: var(--pv-bg);
+  border-bottom: 1px solid var(--pv-border);
+}
+
+.pv-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pv-progress-label {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--pv-ink-faint);
+  font-weight: 600;
+}
+
+.pv-progress-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.pv-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pv-border);
+}
+.pv-dot-done {
+  background: var(--pv-ink-faint);
+}
+.pv-dot-now {
+  width: 9px;
+  height: 9px;
+  background: var(--pv-accent);
+}
+
+.pv-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.pv-loading,
+.pv-error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--pv-ink-muted);
+}
+
+.pv-error {
+  color: var(--pv-error);
+}
+
+/* ---- Page body: illustration + text, side by side on wide screens, stacked on narrow
+   screens (see max-width 480px below) ---- */
+
+.pv-page {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+}
+
+.pv-illustration {
+  flex: 1 1 54%;
+  position: relative;
+  overflow: hidden;
+  background: #1a1524;
+}
+
+.pv-illustration img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pv-textpane {
+  flex: 1 1 46%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 48px;
+  background: var(--pv-surface);
+}
+
+.pv-textpane-inner {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pv-textpane-ending {
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.pv-text {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.95;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--pv-ink);
+}
+
+.pv-text-ending {
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+
+.pv-choices-head {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pv-ink-muted);
+}
+
+.pv-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: -12px;
+}
+
+.pv-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: var(--pv-radius-lg);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pv-icon {
+  flex: 0 0 auto;
+  opacity: 0.75;
+}
+
+.pv-choice-btn {
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+  border: 1.5px solid var(--pv-accent);
+  background: var(--pv-accent-soft);
+  color: var(--pv-accent-dark);
+}
+.pv-choice-btn:hover {
+  background: #f0d0b4;
+}
+
+.pv-btn-primary {
+  border: none;
+  background: var(--pv-accent);
+  color: var(--pv-accent-ink);
+}
+.pv-btn-primary:hover {
+  background: var(--pv-accent-dark);
+}
+
+.pv-btn-ghost {
+  border: 1.5px solid var(--pv-border);
+  background: var(--pv-surface);
+  color: var(--pv-ink-muted);
+  min-height: 50px;
+  font-size: 14.5px;
+}
+
+.pv-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pv-bottom-row {
+  padding-top: 8px;
+  border-top: 1px solid var(--pv-border);
+}
+
+.pv-prev-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--pv-ink-muted);
+  cursor: pointer;
+  padding: 16px 0 0;
+}
+
+@media (max-width: 480px) {
+  .pv-topbar {
+    padding: 14px 20px;
+  }
+
+  .pv-page {
+    flex-direction: column;
+  }
+
+  .pv-illustration {
+    flex: 0 0 auto;
+    height: 320px;
+  }
+
+  .pv-textpane {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 28px 24px 24px;
+  }
+
+  .pv-textpane-inner {
+    max-width: none;
+    text-align: center;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Phone-size ending page - fixed illustration height, content area fills the rest, and the
+   * "Back to the beginning / Previous page" buttons stick to the bottom via
+   * `.actions { margin-top: auto }`. */
+  .pv-textpane-ending {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pv-text {
+    font-size: 17px;
+    line-height: 1.85;
+  }
+
+  .pv-choices-head,
+  .pv-choice-btn,
+  .pv-bottom-row {
+    align-self: stretch;
+    text-align: left;
+  }
+
+  .pv-choices {
+    margin-top: 0;
+  }
+
+  /* Phone-size nav buttons have a 56px minimum height (per the design spec) - a larger
+   * touch target than the 44px used on the wide-screen layout. */
+  .pv-choice-btn,
+  .pv-btn-primary {
+    min-height: 56px;
+  }
+
+  .pv-bottom-row {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .pv-prev-btn {
+    justify-content: center;
+    width: 100%;
+    padding-top: 4px;
+  }
+
+  .pv-actions {
+    margin-top: auto;
+  }
+}

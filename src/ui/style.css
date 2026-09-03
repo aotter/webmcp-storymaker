@@ -1,0 +1,1157 @@
+/* Site-wide styles -- colors/corner radii/shadows/font
+ * sizes are all taken from the CSS variables of the approved design, not copied from the
+ * wireframe's grayscale look. A single <style>-equivalent file; vite natively supports importing
+ * css.
+ *
+ * Every rule here matches DOM produced by ../ui/dom.ts or ../map/render.ts; there are no
+ * styles for editing UI because the page has none. */
+
+:root {
+  color-scheme: light;
+  --c-bg: #fbf6ee;
+  --c-surface: #ffffff;
+  --c-surface-alt: #fffcf6;
+  --c-canvas: #f5e9d3;
+  --c-border: #e7dac0;
+  --c-border-strong: #d8c49e;
+  --c-ink: #2b2419;
+  --c-ink-muted: #7c6f5b;
+  --c-ink-faint: #a99a80;
+  --c-accent: #c1552f;
+  --c-accent-dark: #9e4324;
+  --c-accent-soft: #f5dfcb;
+  --c-accent-ink: #ffffff;
+  --c-success: #4c7a52;
+  --c-success-soft: #e3ebde;
+  --c-warn: #b5502f;
+  --shadow-sm: 0 1px 2px rgba(43, 36, 25, 0.07);
+  --shadow-md: 0 8px 24px rgba(43, 36, 25, 0.1);
+  --shadow-lg: 0 20px 48px rgba(43, 36, 25, 0.16);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --font:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* `[hidden]` is always genuinely hidden -- per the existing discipline (an author rule's specificity
+ * would otherwise override the browser's built-in `[hidden] { display: none }` UA style). */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* Starting with Chrome 140, the "two-finger swipe triggers the browser's
+ * back/forward" gesture only respects overscroll-behavior-x on the html root element (setting it on
+ * body has no effect -- verified by hands-on testing); the map canvas is
+ * separately blocked by .ll-map-canvas-wrap's own overscroll-behavior: contain (see that rule). */
+html {
+  overscroll-behavior-x: none;
+}
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font);
+  line-height: 1.55;
+}
+
+a {
+  color: var(--c-accent);
+}
+a:hover {
+  color: var(--c-accent-dark);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Global shell: top bar + main content area -- the three simple views loading/error/create use a  */
+/* centered stage, while the editor view (the map) uses a full-width layout (see .ll-main-wide).   */
+/* ---------------------------------------------------------------------- */
+
+.ll-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.ll-topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-surface);
+}
+
+.ll-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ll-brand-mark {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ll-brand-text {
+  min-width: 0;
+}
+
+.ll-story-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.ll-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  margin: 0 auto;
+}
+
+.ll-tab {
+  position: relative;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--c-ink-muted);
+  padding: 7px 18px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.ll-tab-on {
+  background: var(--c-surface);
+  color: var(--c-ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The small red dot that needs to stay visible for a pairing request
+ * (pair-request) even while the user isn't on the "phone preview" tab -- see the note on
+ * mountStoryUi() in ../ui/dom.ts; `hidden` is toggled by render() based on
+ * `state.mobilePreview?.phase === "confirm-pairing"`. */
+.ll-tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  box-shadow: 0 0 0 1.5px var(--c-surface);
+}
+
+.ll-topbar-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ll-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-ink-muted);
+  cursor: pointer;
+}
+.ll-icon-btn:hover {
+  color: var(--c-accent-dark);
+  border-color: var(--c-border-strong);
+}
+
+.ll-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--c-success-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c-success);
+  white-space: nowrap;
+}
+
+.ll-status-pill-off {
+  background: var(--c-bg);
+  color: var(--c-ink-muted);
+}
+
+.ll-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-success);
+  flex: 0 0 auto;
+}
+.ll-status-pill-off .ll-status-dot {
+  background: var(--c-ink-faint);
+}
+
+.ll-main {
+  flex: 1;
+  min-height: 0;
+}
+
+.ll-main:not(.ll-main-wide) {
+  display: flex;
+}
+
+.ll-main-wide {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ll-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 40px 16px;
+}
+
+.ll-loading {
+  color: var(--c-ink-muted);
+}
+
+.ll-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+}
+
+.ll-empty {
+  color: var(--c-ink-muted);
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* ---------------------------------------------------------------------- */
+/* The error view                                                          */
+/* ---------------------------------------------------------------------- */
+
+.ll-error-card {
+  max-width: 480px;
+  padding: 28px 32px;
+  box-shadow: var(--shadow-md);
+  color: var(--c-warn);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------- */
+/* The guidance card for the empty state (no story yet) -- just this one card, no form at all (see */
+/* createGuidanceCard() in ../ui/dom.ts).                                                          */
+/* ---------------------------------------------------------------------- */
+
+.ll-guidance-card {
+  position: relative;
+  width: 560px;
+  max-width: 92vw;
+  box-shadow: var(--shadow-lg);
+  padding: 44px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+
+.ll-guidance-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ll-guidance-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.ll-guidance-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--c-ink-muted);
+  max-width: 420px;
+}
+
+.ll-say-bubble {
+  align-self: stretch;
+  text-align: left;
+  background: var(--c-bg);
+  border: 1px dashed var(--c-border-strong);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ll-say-quote {
+  flex: 0 0 auto;
+  font-size: 22px;
+  color: var(--c-accent);
+  line-height: 1;
+  font-weight: 700;
+}
+
+.ll-say-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--c-ink);
+}
+
+.ll-steps {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.ll-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--c-ink-muted);
+}
+
+.ll-step-num {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Generic small widgets: badge, secondary button, error notice -- currently only used by the       */
+/* relay-not-configured/connection-failed edge cases in ../preview/hostPanel.ts (the phone preview  */
+/* panel's other buttons use .ll-mp-btn*).                                                          */
+/* ---------------------------------------------------------------------- */
+
+.ll-button {
+  font: inherit;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.ll-button:hover {
+  border-color: var(--c-border-strong);
+}
+
+.ll-notice {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ll-notice-error {
+  background: #fbe9e2;
+  color: var(--c-warn);
+}
+
+.ll-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------------------- */
+/* The map main view (../map/render.ts) -- canvas (node cards + SVG edges) + right column         */
+/* (readiness + selected node's read-only details).                                               */
+/* ---------------------------------------------------------------------- */
+
+.ll-map-shell {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ll-map-canvas-wrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  /* Pan/zoom is handled by @panzoom/panzoom (see ../map/render.ts), no longer
+   * relying on native scrollbars -- `overflow: hidden` replaces the old `auto`, and `padding` is
+   * removed (so .ll-map-canvas-container's static position is exactly this container's (0,0),
+   * meaning the pan/center calculations don't need to subtract out any padding). */
+  overflow: hidden;
+  /* The map canvas itself is also where the user swipes/scrolls
+   * continuously most often, so this is added to stop the browser gesture from taking over when
+   * dragging reaches the edge (see the same-named rule on html). */
+  overscroll-behavior: contain;
+  background-image: radial-gradient(var(--c-border-strong) 1px, transparent 1px);
+  background-size: 26px 26px;
+  background-color: var(--c-canvas);
+}
+
+.ll-map-canvas-container {
+  position: relative;
+}
+
+/* ---- Top-left readiness chips (../map/render.ts renderReadinessChips()) ---- */
+
+.ll-map-chips {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+}
+
+.ll-map-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-ink);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.ll-map-chip:disabled {
+  cursor: default;
+}
+
+.ll-map-chip-count {
+  font-weight: 700;
+  color: var(--c-warn);
+}
+
+/* Dimmed when the count is 0 -- the whole chip fades, not just the number. */
+.ll-map-chip-zero {
+  opacity: 0.45;
+}
+
+.ll-map-chip-zero .ll-map-chip-count {
+  color: var(--c-ink-faint);
+}
+
+/* ---- Bottom-right zoom buttons (../map/render.ts buildZoomControls()) ---- */
+
+.ll-map-zoom-controls {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.ll-map-zoom-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ll-map-zoom-btn:hover {
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+}
+
+.ll-map-zoom-btn + .ll-map-zoom-btn {
+  border-top: none;
+}
+
+.ll-map-canvas {
+  position: relative;
+}
+
+.ll-map-edges {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ll-map-edge-line {
+  fill: none;
+  stroke: var(--c-border-strong);
+  stroke-width: 2.25;
+}
+
+.ll-map-arrowhead {
+  fill: var(--c-border-strong);
+}
+
+.ll-map-edge-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  color: var(--c-ink-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  /* Choice text can be a sentence: clamp the pill to two centred lines inside the column gap
+   * (ranksep 180 in ../map/layout.ts) so it never runs over the neighbouring cards. */
+  max-width: 150px;
+  text-align: center;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  z-index: 2;
+}
+
+.ll-map-node {
+  position: absolute;
+  text-align: left;
+  font: inherit;
+  color: var(--c-ink);
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3;
+  cursor: pointer;
+}
+
+.ll-map-node:hover:not(:disabled) {
+  border-color: var(--c-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.ll-map-node:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ll-map-node-selected {
+  border-color: var(--c-accent);
+  box-shadow:
+    0 0 0 3px var(--c-accent-soft),
+    var(--shadow-md);
+}
+
+.ll-map-node-gap {
+  border-style: dashed;
+}
+
+.ll-map-node-thumb {
+  position: relative;
+  /* Changed from a fixed 78px height to a
+   * 4:3 ratio -- scales with the card's width (190px); `.ll-map-node-thumb-empty` (the dashed
+   * placeholder shown when there's no art) applies this same class, so the dashed placeholder box
+   * follows along into 4:3 too, without needing a separate rule for it. */
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--c-canvas);
+  flex: 0 0 auto;
+}
+
+.ll-map-node-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ll-map-node-thumb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1.5px dashed var(--c-border-strong);
+  color: var(--c-ink-faint);
+  font-size: 10.5px;
+  text-align: center;
+  padding: 4px;
+}
+
+.ll-map-node-status {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+.ll-map-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--c-warn);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.ll-map-dot-ok {
+  background: var(--c-success);
+  border: none;
+}
+
+.ll-map-dot-missing {
+  background: transparent;
+}
+
+.ll-map-dot-unknown {
+  background: transparent;
+  border-color: var(--c-ink-faint);
+}
+
+.ll-map-node-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ll-map-node-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ll-map-node-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ll-map-node-chip {
+  font-size: 10.5px;
+  color: var(--c-ink-faint);
+}
+
+/* ---- Right column ---- */
+
+.ll-map-aside {
+  flex: 0 0 auto;
+  width: 360px;
+  border-left: 1px solid var(--c-border);
+  background: var(--c-surface);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ll-panel {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ll-panel + .ll-panel {
+  border-top: 1px solid var(--c-border);
+}
+
+.ll-panel-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ll-check-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--c-bg);
+}
+
+.ll-check-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--c-ink);
+}
+
+.ll-check-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--c-warn);
+  flex: 0 0 auto;
+}
+
+.ll-check-dot-ok {
+  border: none;
+  background: var(--c-success);
+}
+
+.ll-check-count {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--c-warn);
+}
+
+.ll-check-count-ok {
+  color: var(--c-success);
+}
+
+.ll-detail-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.ll-badge-selected {
+  background: var(--c-accent);
+  color: var(--c-accent-ink);
+}
+
+.ll-detail-close {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--c-ink-faint);
+  cursor: pointer;
+  padding: 0;
+}
+.ll-detail-close:hover {
+  color: var(--c-ink-muted);
+}
+
+.ll-detail-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.ll-detail-thumb {
+  aspect-ratio: 4 / 3; /* same ratio as the map cards and the generated art */
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--c-canvas);
+}
+
+.ll-detail-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ll-detail-thumb .ll-map-node-thumb-empty {
+  height: 100%;
+  border-radius: 0;
+  border: none;
+}
+
+.ll-detail-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--c-ink);
+  white-space: pre-wrap;
+}
+
+.ll-detail-sub {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-ink-muted);
+}
+
+.ll-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ll-choice-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-alt);
+}
+
+.ll-choice-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ll-choice-dest {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--c-ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ll-cta {
+  align-self: stretch;
+  text-align: center;
+  padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--c-accent);
+  color: var(--c-accent-ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ll-cta:hover {
+  background: var(--c-accent-dark);
+}
+
+@media (max-width: 900px) {
+  .ll-map-shell {
+    flex-direction: column;
+  }
+
+  .ll-map-aside {
+    width: auto;
+    border-left: none;
+    border-top: 1px solid var(--c-border);
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* The "phone preview" tab (../preview/hostPanel.ts) -- QR code + pairing code + manual approval,   */
+/* the top bar's third tab (story map / preview reader / phone preview), a standalone full page, no */
+/* longer side by side with the preview reader. A centered card, not a bar                          */
+/* pinned to the top edge.                                                                          */
+/* ---------------------------------------------------------------------- */
+
+.ll-mp-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  overflow-y: auto;
+  background: var(--c-bg);
+}
+
+.ll-mp-card {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 32px 36px 30px;
+}
+
+.ll-mp-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ll-mp-head-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ll-mp-head-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ll-mp-end-btn {
+  padding: 7px 15px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-ink-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ll-mp-scan-block {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: var(--c-surface-alt);
+  border: 1px solid var(--c-border);
+  flex-wrap: wrap;
+}
+
+.ll-mp-qr-wrap {
+  flex: 0 0 auto;
+  width: 132px;
+  height: 132px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 8px;
+  border: 1px solid var(--c-border);
+}
+
+.ll-mp-qr {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ll-mp-scan-info {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ll-mp-status {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--c-accent-soft);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-accent-dark);
+  margin: 0;
+}
+
+.ll-mp-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-accent);
+}
+
+.ll-mp-code-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-ink-muted);
+}
+
+.ll-mp-code {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--c-ink);
+}
+
+.ll-mp-caption {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--c-ink-muted);
+}
+
+.ll-mp-confirm-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--c-accent);
+  background: var(--c-accent-soft);
+}
+
+.ll-mp-confirm-text {
+  flex: 1 1 200px;
+  min-width: 0;
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--c-accent-dark);
+  line-height: 1.5;
+}
+
+.ll-mp-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}
+
+.ll-mp-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ll-mp-btn-approve {
+  border: none;
+  background: var(--c-accent);
+  color: var(--c-accent-ink);
+}
+
+.ll-mp-btn-reject {
+  border: 1.5px solid var(--c-border-strong);
+  background: var(--c-surface);
+  color: var(--c-ink-muted);
+}
+
+.ll-mp-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.ll-mp-footer p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--c-ink-faint);
+}
+
+/* The mount shell for the editor view's three tabs "story map"/"preview reader"/"phone preview" --
+ * both the map view and the phone preview view are only built once, and the three tab containers
+ * toggle visibility with `hidden` instead of being rebuilt wholesale. Stacked with
+ * `position: absolute`, so `.pv-root`'s `height: 100%` (../preview/reader.css) can resolve directly
+ * against the "preview reader" tab's own `.ll-editor-tab-container` to get a fixed height, with no
+ * extra wrapper needed. */
+.ll-editor-mount {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.ll-editor-tab-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Every clickable button shows a pointer cursor; disabled ones keep their own not-allowed/default. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+.ll-icon-btn-danger:hover {
+  color: #b3261e;
+  border-color: #b3261e;
+}
